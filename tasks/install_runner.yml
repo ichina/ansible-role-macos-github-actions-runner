@@ -50,6 +50,16 @@
     chdir: "{{ runner_dir }}"
   when: runner_version not in runner_installed.stdout or reinstall_runner
 
+- name: Update template
+  shell: |
+    plutil -insert EnvironmentVariables.CI_CACHE_DIR -string "$HOME/Cache" {{ runner_dir }}/bin/actions.runner.plist.template
+    plutil -insert EnvironmentVariables.CI_DERIVED_DATA_CACHE_PATH -string "$CI_CACHE_DIR/DerivedData" {{ runner_dir }}/bin/actions.runner.plist.template
+    plutil -insert EnvironmentVariables.CI_SPM_SOURCE_PACKAGES_CACHE_PATH -string "$CI_CACHE_DIR/swiftpm" {{ runner_dir }}/bin/actions.runner.plist.template
+    cat {{ runner_dir }}/bin/actions.runner.plist.template
+  args:
+    chdir: "{{ runner_dir }}"
+  when: runner_version not in runner_installed.stdout or reinstall_runner
+
 - name: Configure
   block:
     - name: Configure runner for {{ runner_org | ternary('org', 'repo') }}
